@@ -223,12 +223,12 @@ module itof#(
     // Total number of bits.
     parameter   integer width       = 32,
     // Optional number of fractional bits.
-    parameter   integer frac        = 0,
-    // Whether the input number is signed.
-    parameter   bit     issigned    = 1
+    parameter   integer frac        = 0
 )(
     // Integer to convert.
     input  logic[width-1:0] in,
+    // Input integer is signed.
+    input  logic            issigned,
     // Floating-point representation.
     output float            out
 );
@@ -271,9 +271,9 @@ module itof#(
     // True exponent.
     wire signed[ewidth-1:0]         exp = msb - frac;
     // Shift left number for mantissa.
-    wire signed[$clog2(mwidth)-1:0] shl = $bits(out.mantissa) - msb;
+    wire signed[$clog2(mwidth)+1:0] shl = $bits(out.mantissa) - msb;
     // True mantissa.
-    logic      [mwidth-1:0]         man = shl > 0 ? tmp << shl : tmp >> -shl;
+    wire       [mwidth-1:0]         man = shl > 0 ? tmp << shl : tmp >> -shl;
     
     // Output mux.
     always @(*) begin
@@ -286,6 +286,57 @@ module itof#(
         end else begin
             // Normal number.
             out = '{sign, exp + bias, man};
+        end
+    end
+endmodule
+
+// Floating-point number to fixed-point integer converter.
+// NaN is treated as infinity, which is clipped to the maximum (un)signed value.
+module ftoi#(
+    // Floating-point type as described in the README.
+    type                float       = svfloat::float32,
+    // Total number of bits.
+    parameter   integer width       = 32,
+    // Optional number of fractional bits.
+    parameter   integer frac        = 0
+)(
+    // Floating-point number to convert.
+    input  float            in,
+    // Output integer is signed.
+    input  logic            issigned,
+    // Integer representation.
+    output logic[width-1:0] out
+);
+    // Number of bits required to represent true exponent.
+    localparam  integer ewidth      = $bits(in.exponent);
+    // Number of bits required to represent true mantissa.
+    localparam  integer mwidth      = $bits(in.mantissa) + 1;
+    // Exponent bias.
+    localparam  integer bias        = (1 << ($bits(in.exponent) - 1)) - 1;
+    // Maximum stored exponent.
+    localparam  integer max_exp     = (1 << $bits(in.exponent)) - 1;
+    
+    // True exponent.
+    wire signed[ewidth-1:0]         exp = in.exponent - bias;
+    // True mantissa.
+    logic      [width-1:0]          man;
+    assign      man[width-1:mwidth]     = 0;
+    assign      man[mwidth-1]           = in.exponent != 0;
+    assign      man[mwidth-2:0]         = in.mantissa;
+    // Amount to shift left the mantissa.
+    wire signed[$clog2(mwidth)+1:0] shl = exp - $bits(in.mantissa) + frac;
+    // Unsigned value of the integer.
+    wire       [width-1:0]          tmp = shl > 0 ? (man << shl) : (man >> -shl);
+    
+    // Output mux.
+    always @(*) begin
+        if (in.exponent == max_exp || exp >= width - issigned) begin
+            // Edge case: NaN / infinity / too big to fit.
+            out[width-2:0] = -1;
+            out[width-1]   = in.sign || !issigned;
+        end else begin
+            // Representable as an integer.
+            out = issigned && in.sign ? -tmp : tmp;
         end
     end
 endmodule
