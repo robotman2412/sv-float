@@ -124,8 +124,10 @@ class ffunc#(
             $display("%cinf", f.sign ? "-" : "+");
         end else if (is_nan(f)) begin
             $display("%cnan", f.sign ? "-" : "+");
+        end else if (true_exponent(f) < 0) begin
+            $display("%c %01b.%01b * 10^-%01b", f.sign ? "-" : "+", is_normal(f), f.mantissa, -true_exponent(f));
         end else begin
-            $display("%c %01b.%01b * 10^%01b", f.sign ? "-" : "+", is_normal(f), f.mantissa, true_exponent(f));
+            $display("%c %01b.%01b * 10^%01b",  f.sign ? "-" : "+", is_normal(f), f.mantissa, true_exponent(f));
         end
     endfunction
     
@@ -230,29 +232,60 @@ module itof#(
     // Floating-point representation.
     output float            out
 );
+    genvar x;
+    
     // Number of bits required to represent true exponent.
-    localparam  integer ewidth      = $max($clog2(width), $bits(out.exponent));
+    localparam  integer ewidth      = $clog2(width) > $bits(out.exponent) ? $clog2(width) : $bits(out.exponent);
     // Number of bits required to represent true mantissa.
-    localparam  integer mwidth      = $max(width, $bits(out.mantissa) + 1);
+    localparam  integer mwidth      = $bits(out.mantissa) + 1 > width ? $bits(out.mantissa) + 1 : width;
+    // Exponent bias.
+    localparam  integer bias        = (1 << ($bits(out.exponent) - 1)) - 1;
+    // Maximum stored exponent.
+    localparam  integer max_exp     = (1 << $bits(out.exponent)) - 1;
+    // Maximum finite true exponent.
+    localparam  integer max_texp    = max_exp - bias - 1;
+    // Minimum finite true exponent.
+    localparam  integer min_texp    = -bias + 1;
     
     // Unsigned version.
     wire                sign = issigned && in[width-1];
     wire [width-1:0]    tmp  = sign ? -in : in;
+    logic[width-1:0]    msb_mask;
+    generate
+        for (x = 0; x < width-1; x = x + 1) begin
+            assign msb_mask[x] = tmp[x] && tmp[width-1:x+1] == 0;
+        end
+        assign msb_mask[width-1] = tmp[width-1];
+    endgenerate
+    
+    // Index of most significant set bit.
+    logic[ewidth-1:0]   msb;
+    always @(*) begin
+        integer i;
+        msb = 0;
+        for (i = 0; i < width; i = i + 1) begin
+            msb |= i * msb_mask[i];
+        end
+    end
     
     // True exponent.
-    logic[ewidth-1:0]   exp;
+    wire signed[ewidth-1:0]         exp = msb - frac;
+    // Shift left number for mantissa.
+    wire signed[$clog2(mwidth)-1:0] shl = $bits(out.mantissa) - msb;
     // True mantissa.
-    logic[mwidth-1:0]   man;
+    logic      [mwidth-1:0]         man = shl > 0 ? tmp << shl : tmp >> -shl;
     
+    // Output mux.
     always @(*) begin
-        if (tmp == 0) begin
-            // Edge case: Zero.
-            out = 0;
-        end else if (0) begin
+        if (width - frac - 1 > max_texp && exp > max_texp) begin
+            // Edge case: Infinity.
+            out = '{sign, max_exp, 0};
+        end else if (exp < min_texp) begin
             // Edge case: Denormalized number.
+            out = '{sign, 0, man >> (min_texp - exp)};
         end else begin
             // Normal number.
-            out = '{sign, exp, man};
+            out = '{sign, exp + bias, man};
         end
     end
 endmodule
