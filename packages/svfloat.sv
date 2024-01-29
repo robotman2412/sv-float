@@ -55,17 +55,17 @@ class ffunc#(
 );
     float dummy;
     // Number of exponent bits.
-    localparam  exp_width   = $bits(dummy.exponent);
+    parameter   exp_width   = $bits(dummy.exponent);
     // Number of explicit mantissa bits.
-    localparam  man_width   = $bits(dummy.mantissa);
+    parameter   man_width   = $bits(dummy.mantissa);
     // Total bit width of this type.
     localparam  width       = 1 + exp_width + man_width;
     // Bit offset of mantissa in float64.
     localparam  man_off     = 52 - man_width;
     // Exponent bias.
-    localparam  exp_bias    = (1 << (exp_width - 1)) - 1;
+    parameter   exp_bias    = (1 << (exp_width - 1)) - 1;
     // Maximum exponent value.
-    localparam  exp_max     = (1 << exp_width) - 1;
+    parameter   exp_max     = (1 << exp_width) - 1;
     
     
     
@@ -125,9 +125,9 @@ class ffunc#(
         end else if (is_nan(f)) begin
             $display("%cnan", f.sign ? "-" : "+");
         end else if (true_exponent(f) < 0) begin
-            $display("%c %01b.%01b * 10^-%01b", f.sign ? "-" : "+", is_normal(f), f.mantissa, -true_exponent(f));
+            $display("%c %01b.%b * 10^-%01b", f.sign ? "-" : "+", is_normal(f), f.mantissa, -true_exponent(f));
         end else begin
-            $display("%c %01b.%01b * 10^%01b",  f.sign ? "-" : "+", is_normal(f), f.mantissa, true_exponent(f));
+            $display("%c %01b.%b * 10^%01b",  f.sign ? "-" : "+", is_normal(f), f.mantissa, true_exponent(f));
         end
     endfunction
     

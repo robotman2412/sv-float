@@ -24,7 +24,7 @@ module itof#(
     genvar x;
     
     // Number of bits required to represent true exponent.
-    localparam  integer ewidth      = $clog2(width) > $bits(out.exponent) ? $clog2(width) : $bits(out.exponent);
+    localparam  integer ewidth      = $clog2(width) > $bits(out.exponent) + 1 ? $clog2(width) : $bits(out.exponent) + 1;
     // Number of bits required to represent true mantissa.
     localparam  integer mwidth      = $bits(out.mantissa) + 1 > width ? $bits(out.mantissa) + 1 : width;
     // Exponent bias.
@@ -97,7 +97,7 @@ module ftoi#(
     output logic[width-1:0] out
 );
     // Number of bits required to represent true exponent.
-    localparam  integer ewidth      = $bits(in.exponent);
+    localparam  integer ewidth      = $bits(in.exponent) + 1;
     // Number of bits required to represent true mantissa.
     localparam  integer mwidth      = $bits(in.mantissa) + 1;
     // Exponent bias.
