@@ -64,9 +64,11 @@ class ffunc#(
     localparam  man_off     = 52 - man_width;
     // Exponent bias.
     parameter   exp_bias    = (1 << (exp_width - 1)) - 1;
-    // Maximum exponent value.
+    // Maximum stored exponent value.
     parameter   exp_max     = (1 << exp_width) - 1;
     
+    // Minimum number of bits required to store true exponent.
+    parameter   texp_width  = $clog2(2 ** (exp_width + 1) + $clog2(man_width));
     
     
     // Constant: Positive infinity.

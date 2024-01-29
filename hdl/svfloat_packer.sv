@@ -5,8 +5,8 @@
 
 
 
-// Floating-point normalizer.
-module svfloat_normalizer#(
+// Floating-point packer.
+module svfloat_packer#(
     // Floating-point type as described in the README.
     type                float       = svfloat::float32,
     // Width of the input exponent.
@@ -48,23 +48,9 @@ module svfloat_normalizer#(
     // Minimum true exponent value.
     localparam  integer min_texp        = 1 - exp_bias;
     
-    // Most significant set bit in the input mantissa.
-    logic       [width-1:0]         msb_mask;
-    generate
-        for (x = 0; x < width - 1; x = x + 1) begin
-            assign msb_mask[x] = d_man[x] && d_man[width-1:x+1] == 0;
-        end
-        assign msb_mask[width-1] = d_man[width-1];
-    endgenerate
     // Index of the most significant bit.
     logic       [$clog2(width)-1:0] msb;
-    always @(*) begin
-        integer i;
-        msb = 0;
-        for (i = 0; i < width; i = i + 1) begin
-            msb |= i * msb_mask[i];
-        end
-    end
+    svfloat_msb#(width) man_msb(d_man, msb);
     
     // Widen exponent.
     wire  signed[exp_width+1:0]     w_exp   = d_exp;
@@ -79,7 +65,7 @@ module svfloat_normalizer#(
     always @(*) begin
         if (is_inf || is_nan) begin
             // Value overriden.
-            res = '{d_sign, exp_max, is_nan};
+            res = '{d_sign, exp_max, is_nan << (man_width - 1)};
         end else if (is_zero) begin
             // Value overridden.
             res = '{d_sign, 0, 0};

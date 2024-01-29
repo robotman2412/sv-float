@@ -19,6 +19,6 @@ module top(
     assign add = 0;
     assign sub = 0;
     
-    fmuldiv#(svfloat::float32, "mul") fmul(clk, lhs, rhs, mul);
-    fmuldiv#(svfloat::float32, "div") fdiv(clk, lhs, rhs, div);
+    svfloat_muldiv#(svfloat::float32, "mul") fmul(clk, lhs, rhs, mul);
+    svfloat_muldiv#(svfloat::float32, "div") fdiv(clk, lhs, rhs, div);
 endmodule

@@ -43,7 +43,17 @@ size_t test_len = sizeof(test) / sizeof(float);
 
 static char const *ftos(float value) {
     uint32_t bits = *(uint32_t *)&value;
-    snprintf(floatbuf, sizeof(floatbuf) - 1, "\"%+f\"", value);
+    if (bits == 0x80000000) {
+        strcpy(floatbuf, "\"-0\"");
+    } else if (bits == 0x00000000) {
+        strcpy(floatbuf, "\"+0\"");
+    } else if (isfinite(value) && (value > 65536 || (value > 0 && value < 1))) {
+        snprintf(floatbuf, sizeof(floatbuf) - 1, "\"+2^%d\"", (int)log2f(value));
+    } else if (isfinite(value) && (value < -65536 || (value < 0 && value > -1))) {
+        snprintf(floatbuf, sizeof(floatbuf) - 1, "\"-2^%d\"", (int)log2f(-value));
+    } else {
+        snprintf(floatbuf, sizeof(floatbuf) - 1, "\"%+f\"", value);
+    }
     return floatbuf;
 }
 
