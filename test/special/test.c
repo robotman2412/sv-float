@@ -9,7 +9,6 @@
 
 #define SIM_EXEC "obj_dir/sim"
 
-char  floatbuf[128];
 float test[] = {
     NAN,
     -NAN,
@@ -41,6 +40,7 @@ size_t test_len = sizeof(test) / sizeof(float);
         fprintf(fd, "\n");                                                                                             \
     }
 
+char               floatbuf[128];
 static char const *ftos(float value) {
     uint32_t bits = *(uint32_t *)&value;
     if (bits == 0x80000000) {

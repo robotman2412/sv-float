@@ -25,7 +25,7 @@ module svfloat_unpacker#(
     
     // True exponent.
     output logic signed
-    [ffunc#(float)::texp_width-1:0]   exp,
+    [ffunc#(float)::texp_width-1:0] exp,
     // True mantissa.
     output logic
     [$bits(in.mantissa):0]          man

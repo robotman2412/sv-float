@@ -55,7 +55,7 @@ module svfloat_packer#(
     // Widen exponent.
     wire  signed[exp_width+1:0]     w_exp   = d_exp;
     // Amount to shift left input to create true mantissa.
-    wire  signed[$clog2(width)-1:0] shl     = man_width - msb;
+    wire  signed[$clog2(width):0]   shl     = man_width - msb;
     // Normalized true exponent.
     wire  signed[exp_width+1:0]     exp     = w_exp - frac + msb;
     // Normalized true mantissa.
