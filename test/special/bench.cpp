@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     // Run a number of clock cycles.
     top->lhs = lhs;
     top->rhs = rhs;
-    for (int i = 0; i <= 1000 && !contextp->gotFinish(); i++) {
+    for (int i = 0; i <= 10 && !contextp->gotFinish(); i++) {
         top->clk ^= 1;
         top->eval();
         trace->dump(i * 10);
@@ -37,9 +37,10 @@ int main(int argc, char **argv) {
     FILE *fd = fopen(argv[1], "w");
     if (fd) {
         fprintf(fd, "0x%08x 0x%08x 0x%08x 0x%08x\n", top->mul, top->div, top->add, top->sub);
+        fflush(fd);
         fclose(fd);
     } else {
-        printf("Unable to open %s\n", argv[1]);
+        printf("Unable to write %s\n", argv[1]);
         perror("");
     }
 

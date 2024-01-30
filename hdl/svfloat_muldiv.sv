@@ -180,8 +180,8 @@ module svfloat_muldiv#(
     logic signed[texp_width-1:0]    s2_rhs_exp;
     logic       [man_width:0]       s2_rhs_man;
     generate
-        if (plr_pre_mul) begin
-            always @(posedge clk) begin: s1s2_plr
+        if (plr_pre_mul) begin: s1s2_plr
+            always @(posedge clk) begin
                 s2_is_inf   <= s1_is_inf;
                 s2_is_nan   <= s1_is_nan;
                 s2_is_zero  <= s1_is_zero;
@@ -227,8 +227,8 @@ module svfloat_muldiv#(
     logic signed[texp_width-1:0]    s3_res_exp;
     logic       [mul_width-1:0]     s3_res_man;
     generate
-        if (plr_pre_mul) begin
-            always @(posedge clk) begin: s2s3_plr
+        if (plr_pre_mul) begin: s2s3_plr
+            always @(posedge clk) begin
                 s3_is_inf   <= s2_is_inf;
                 s3_is_nan   <= s2_is_nan;
                 s3_is_zero  <= s2_is_zero;

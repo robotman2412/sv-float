@@ -5,15 +5,15 @@
 
 
 
-// Floating-point divider.
-// Shorthand for `svfloat_divdiv#(.mode("div"))`.
-module svfloat_div#(
+// Optionally pipelined floating-point subtractor.
+// Shorthand for negation of RHS preserving NaN and addition.
+module svfloat_sub#(
     // Floating-point type as described in the README.
     type                float           = svfloat::float32,
-    // Enable pipeline register before divtiplier.
-    parameter   bit     plr_pre_div     = 0,
-    // Enable pipeline register after divtiplier.
-    parameter   bit     plr_post_div    = 0
+    // Enable pipeline register before adder.
+    parameter   bit     plr_pre_add     = 0,
+    // Enable pipeline register after adder.
+    parameter   bit     plr_post_add    = 0
 )(
     // Pipeline clock.
     // Ignored if all pipeline registers are disabled.
@@ -26,7 +26,7 @@ module svfloat_div#(
     // Result.
     output float                res
 );
-    svfloat_muldiv#(float, "div", plr_pre_div, plr_post_div) div(
-        clk, lhs, rhs, res
-    );
+    float nrhs;
+    svfloat_neg#(float) fneg(rhs, 1, 1, nrhs);
+    svfloat_add#(float, plr_pre_add, plr_post_add) fadd(clk, lhs, nrhs, res);
 endmodule

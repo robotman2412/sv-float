@@ -17,7 +17,7 @@ build: test.c
 		-j $(shell nproc) bench.cpp $(HDL) -o sim
 
 clean:
-	rm -rf build
+	rm -rf build obj_dir
 
 run: build
 	./build/test

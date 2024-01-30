@@ -28,7 +28,7 @@ size_t test_len = sizeof(test) / sizeof(float);
 
 #define TEST_CASE(oper, func, fd)                                                                                      \
     fprintf(fd, "\n");                                                                                                 \
-    fprintf(fd, #oper);                                                                                                \
+    fprintf(fd, "\"" #oper "\"");                                                                                      \
     for (size_t x = 0; x < test_len; x++) {                                                                            \
         fprintf(fd, ";%s", ftos(test[x]));                                                                             \
     }                                                                                                                  \
@@ -87,12 +87,17 @@ static sim_res_t run_sim(float a, float b) {
     snprintf(sysbuf, sizeof(sysbuf) - 1, "%s %s %s.fst %08x %08x", SIM_EXEC, pathbuf, pathbuf, bits_a, bits_b);
     system(sysbuf);
     FILE *fd = fopen(pathbuf, "r");
+    if (!fd) {
+        printf("Unable to read %s\n", pathbuf);
+        exit(1);
+    }
 
     // Parse file.
     uint32_t bits_mul, bits_div, bits_add, bits_sub;
     int      res = fscanf(fd, "0x%08x 0x%08x 0x%08x 0x%08x\n", &bits_mul, &bits_div, &bits_add, &bits_sub);
     if (res != 4) {
-        printf("Unable to parse %s", pathbuf);
+        printf("Unable to parse %s\n", pathbuf);
+        perror("");
         exit(1);
     }
     fclose(fd);
@@ -171,6 +176,7 @@ int main(int argc, char **argv) {
     TEST_CASE(/, c_div, fd)
     TEST_CASE(+, c_add, fd)
     TEST_CASE(-, c_sub, fd)
+    fflush(fd);
     fclose(fd);
 
     fd = fopen("build/result.csv", "w");
@@ -180,6 +186,7 @@ int main(int argc, char **argv) {
     TEST_CASE(/, sim_div, fd)
     TEST_CASE(+, sim_add, fd)
     TEST_CASE(-, sim_sub, fd)
+    fflush(fd);
     fclose(fd);
 
     fd = fopen("build/difference.csv", "w");
@@ -189,6 +196,7 @@ int main(int argc, char **argv) {
     TEST_CASE(/, diff_div, fd)
     TEST_CASE(+, diff_add, fd)
     TEST_CASE(-, diff_sub, fd)
+    fflush(fd);
     fclose(fd);
 
     printf(

@@ -16,9 +16,8 @@ module top(
     output logic[31:0]  add,
     output logic[31:0]  sub
 );
-    assign add = 0;
-    assign sub = 0;
-    
-    svfloat_muldiv#(svfloat::float32, "mul") fmul(clk, lhs, rhs, mul);
-    svfloat_muldiv#(svfloat::float32, "div") fdiv(clk, lhs, rhs, div);
+    svfloat_mul fmul(clk, lhs, rhs, mul);
+    svfloat_div fdiv(clk, lhs, rhs, div);
+    svfloat_add fadd(clk, lhs, rhs, add);
+    svfloat_sub fsub(clk, lhs, rhs, sub);
 endmodule
