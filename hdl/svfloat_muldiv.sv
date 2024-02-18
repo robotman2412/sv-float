@@ -186,10 +186,10 @@ module svfloat_muldiv#(
                 s2_is_nan   <= s1_is_nan;
                 s2_is_zero  <= s1_is_zero;
                 s2_sign     <= s1_sign;
-                s2_lhs_exp  <= s1_lhs_exp;
                 s2_lhs_man  <= s1_lhs_man;
-                s2_rhs_exp  <= s1_rhs_exp;
+                s2_lhs_exp  <= s1_lhs_exp;
                 s2_rhs_man  <= s1_rhs_man;
+                s2_rhs_exp  <= s1_rhs_exp;
             end
         end else begin: s1s2_comb
             assign s2_is_inf    = s1_is_inf;

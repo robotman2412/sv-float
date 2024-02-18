@@ -140,11 +140,11 @@ module svfloat_add#(
                 s2_is_nan   <= s1_is_nan;
                 s2_is_zero  <= s1_is_zero;
                 s2_lhs_sign <= lhs.sign;
-                s2_lhs_exp  <= s1_lhs_exp;
                 s2_lhs_man  <= s1_lhs_man;
+                s2_lhs_exp  <= s1_lhs_exp;
                 s2_rhs_sign <= rhs.sign;
-                s2_rhs_exp  <= s1_rhs_exp;
                 s2_rhs_man  <= s1_rhs_man;
+                s2_rhs_exp  <= s1_rhs_exp;
             end
         end else begin: s1s2_comb
             assign s2_sign_ovr  = s1_sign_ovr;
@@ -175,12 +175,12 @@ module svfloat_add#(
     always @(*) begin
         if (s2_lhs_exp > s2_rhs_exp) begin
             // LHS has bigger exponent.
-            s2_res_exp = s1_lhs_exp;
+            s2_res_exp = s2_lhs_exp;
             s2_lhs_shl = 1;
             s2_rhs_shl = 1 - s2_exp_diff;
         end else begin
             // RHS has bigger exponent.
-            s2_res_exp = s1_rhs_exp;
+            s2_res_exp = s2_rhs_exp;
             s2_lhs_shl = 1 + s2_exp_diff;
             s2_rhs_shl = 1;
         end
