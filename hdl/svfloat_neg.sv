@@ -13,9 +13,9 @@ module svfloat_neg#(
     // Argument.
     input  float                val,
     // Negate the sign.
-    input  logic                neg,
+    input  wire                 neg,
     // Preserve sign on NaN.
-    input  logic                presv_nan,
+    input  wire                 presv_nan,
     // Result.
     output float                res
 );

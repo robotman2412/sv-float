@@ -20,7 +20,7 @@ module svfloat_muldiv#(
 )(
     // Pipeline clock.
     // Ignored if all pipeline registers are disabled.
-    input  logic                clk,
+    input  wire                 clk,
     
     // Left-hand side argument.
     input  float                lhs,

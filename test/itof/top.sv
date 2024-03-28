@@ -6,7 +6,7 @@
 
 
 module top(
-    input  logic[31:0]  val,
+    input  wire [31:0]  val,
     output logic[31:0]  uitof,
     output logic[31:0]  itof
 );

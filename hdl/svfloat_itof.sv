@@ -15,9 +15,9 @@ module svfloat_itof#(
     parameter   integer frac        = 0
 )(
     // Integer to convert.
-    input  logic[width-1:0] in,
+    input  wire [width-1:0] in,
     // Input integer is signed.
-    input  logic            issigned,
+    input  wire             issigned,
     // Floating-point representation.
     output float            out
 );

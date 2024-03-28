@@ -17,18 +17,18 @@ module svfloat_packer#(
     parameter   integer frac        = 23
 )(
     // Override: Infinity.
-    input  logic                    is_inf,
+    input  wire                     is_inf,
     // Override: NaN.
-    input  logic                    is_nan,
+    input  wire                     is_nan,
     // Override: Zero.
-    input  logic                    is_zero,
+    input  wire                     is_zero,
     
     // Sign of the float.
-    input  logic                    d_sign,
+    input  wire                     d_sign,
     // Unbiased exponent to normalize.
-    input  logic signed[ewidth-1:0] d_exp,
+    input  wire  signed[ewidth-1:0] d_exp,
     // Mantissa to normalize.
-    input  logic       [width-1:0]  d_man,
+    input  wire        [width-1:0]  d_man,
     
     // Result.
     output float                    res

@@ -18,7 +18,7 @@ module svfloat_ftoi#(
     // Floating-point number to convert.
     input  float            in,
     // Output integer is signed.
-    input  logic            issigned,
+    input  wire             issigned,
     // Integer representation.
     output logic[width-1:0] out
 );

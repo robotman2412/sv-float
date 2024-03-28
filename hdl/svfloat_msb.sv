@@ -13,7 +13,7 @@ module svfloat_msb#(
     parameter   integer exp   = $clog2(width)
 )(
     // Integer to check.
-    input  logic[width-1:0] raw,
+    input  wire [width-1:0] raw,
     // Index of MSB, if any.
     output logic[exp-1:0]   msb
 );

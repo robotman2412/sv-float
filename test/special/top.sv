@@ -6,10 +6,10 @@
 
 
 module top(
-    input  logic clk,
+    input  wire  clk,
     
-    input  logic[31:0]  lhs,
-    input  logic[31:0]  rhs,
+    input  wire [31:0]  lhs,
+    input  wire [31:0]  rhs,
     
     output logic[31:0]  mul,
     output logic[31:0]  div,
